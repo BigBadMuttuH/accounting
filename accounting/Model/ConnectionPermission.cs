@@ -1,4 +1,4 @@
-﻿namespace accounting
+﻿namespace accounting.Model
 {
     public class ConnectionPermission
     {
@@ -17,7 +17,7 @@
             RegistrationNumber = registrationNumber;
             Url = url;
         }
-        
+
         public override string ToString()
         {
             return $"Permission Number: {PermissionNumber}, Permission Date: {PermissionDate}, URL: {Url}";

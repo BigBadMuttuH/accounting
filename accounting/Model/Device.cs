@@ -1,6 +1,7 @@
 ﻿using System.Management;
+using accounting.DataBase;
 
-namespace accounting
+namespace accounting.Model
 {
     /// <summary>
     /// Класс для USB устройства - flash-USB
@@ -34,7 +35,7 @@ namespace accounting
         }
 
         /// <summary>
-        /// Получить информацию о подключенной флешке
+        /// Получить информацию о подключенной флешке в OS Windows
         /// </summary>
         public void GetDeviceInformFromSystem()
         {

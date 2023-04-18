@@ -1,7 +1,7 @@
 ﻿using System.DirectoryServices;
 using System.Security.Principal;
 
-namespace accounting
+namespace accounting.Model
 {
     public class User
     {
