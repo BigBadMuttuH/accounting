@@ -1,12 +1,25 @@
 ﻿using accounting.Model;
 using accounting.DataBase;
+using accounting.View;
+using accounting.Controller;
 using ConsoleTables;
 using System.Collections.Generic;
-using accounting.View;
 
-DeviceView devicesView = new DeviceView();
-devicesView.PrintAllDevices();
-
+while (true)
+{
+    Console.Clear();
+    DeviceView devicesView = new DeviceView();
+    devicesView.PrintAllDevices();
+    Console.WriteLine("a - add; r - remove; d - delete device. (q - Exit)");
+    var userChoice = Console.ReadKey().KeyChar;
+    DeviceController deviceController = new DeviceController();
+    deviceController.HandleKeyPress(userChoice);
+    if (userChoice == 'q')
+    {
+        Console.WriteLine("Exit.");
+        return;
+    }
+}
 
 //Device device1 = new Device();
 //device1.InventoryNumber = "0001/23П";

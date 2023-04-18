@@ -1,89 +1,130 @@
 ﻿using accounting.Model;
 using Npgsql;
 
-namespace accounting.DataBase
+namespace accounting.DataBase;
+
+public class DeviceDataAccess : IDataAccess<Device>
 {
-    public class DeviceDataAccess : IDataAccess<Device>
+    public static PgSQLConnectionString ConnString = new()
     {
-        public static PgSQLConnectionString connString = new PgSQLConnectionString
-        {
-            Host = "localhost",
-            Port = "5432",
-            Database = "acl",
-            User = "postgres",
-            Password = "postgres"
-        };
+        Host = "localhost",
+        Port = "5432",
+        Database = "acl",
+        User = "postgres",
+        Password = "postgres"
+    };
 
-        private readonly string connectionString = connString.ToString();
+    private readonly string _connectionString = ConnString.ToString();
 
-        public void Add(Device entity)
+    public void Add(Device entity)
+    {
+        using var connection = new NpgsqlConnection(_connectionString);
+        ConnectionOpen(connection);
+
+        using var command =
+            new NpgsqlCommand(
+                "INSERT INTO device (id, model, vid, pid, serial_number, inventory_number) VALUES (@id, @model, @vid, @pid, @serial_number, @inventory_number)",
+                connection);
+        command.Parameters.AddWithValue("@id", entity.Id);
+        command.Parameters.AddWithValue("@model", entity.Model);
+        command.Parameters.AddWithValue("@vid", entity.Vid);
+        command.Parameters.AddWithValue("@pid", entity.Pid);
+        command.Parameters.AddWithValue("@serial_number", entity.SerialNumber);
+        command.Parameters.AddWithValue("@inventory_number", entity.InventoryNumber);
+        try
         {
-            throw new NotImplementedException();
+            command.ExecuteNonQuery();
         }
-
-        public void Delete(int id)
+        catch (Exception e)
         {
-            throw new NotImplementedException();
+            throw new Exception("Fail to execute query.", e);
         }
+    }
 
-        public IEnumerable<Device> GetAll()
+    public void Delete(int id)
+    {
+        using var connection = new NpgsqlConnection(_connectionString);
+        ConnectionOpen(connection);
+        using var command = new NpgsqlCommand("DELETE FROM device WHERE id = @id", connection);
+        command.Parameters.AddWithValue("@id", id);
+
+        var rowsAffected = command.ExecuteNonQuery();
+
+        if (rowsAffected == 0) throw new Exception($"No device found with id {id}");
+    }
+
+    public IEnumerable<Device> GetAll()
+    {
+        using var connection = new NpgsqlConnection(_connectionString);
+        ConnectionOpen(connection);
+
+        using var command = new NpgsqlCommand("SELECT * FROM device", connection);
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+            yield return new Device(
+                reader.GetInt32(0),
+                reader.GetString(1),
+                reader.GetString(2),
+                reader.GetString(3),
+                reader.GetString(4),
+                reader.GetString(5)
+            );
+    }
+
+
+    public Device GetById(int id)
+    {
+        using var connection = new NpgsqlConnection(_connectionString);
+        ConnectionOpen(connection);
+        using var command = new NpgsqlCommand("SELECT * FROM device WHERE id = @id", connection);
+        command.Parameters.AddWithValue("@id", id);
+        using var reader = command.ExecuteReader();
+        if (reader.Read())
+            return new Device(
+                reader.GetInt32(0),
+                reader.GetString(1),
+                reader.GetString(2),
+                reader.GetString(3),
+                reader.GetString(4),
+                reader.GetString(5)
+            );
+        return null!;
+    }
+
+    public void Update(Device entity)
+    {
+        using var connection = new NpgsqlConnection(_connectionString);
+        ConnectionOpen(connection);
+        using var command =
+            new NpgsqlCommand(
+                "UPDATE device SET model = @model, vid = @vid, pid = @pid, serial_number = @serial_number, inventory_number = @inventory_number WHERE id = @id",
+                connection);
+        command.Parameters.AddWithValue("@model", entity.Model);
+        command.Parameters.AddWithValue("@vid", entity.Vid);
+        command.Parameters.AddWithValue("@pid", entity.Pid);
+        command.Parameters.AddWithValue("@serial_number", entity.SerialNumber);
+        command.Parameters.AddWithValue("@inventory_number", entity.InventoryNumber);
+        command.Parameters.AddWithValue("@id", entity.Id);
+
+        var rowsAffected = command.ExecuteNonQuery();
+        if (rowsAffected == 0)
+            throw new Exception("No rows updated. Device with given Id does not exist in the database.");
+    }
+
+    /// <summary>
+    ///     Trying open connection to DataBase
+    /// </summary>
+    /// <param name="connection"></param>
+    /// <exception cref="Exception"></exception>
+    private static void ConnectionOpen(NpgsqlConnection connection)
+    {
+        try
         {
-            using (var connection = new NpgsqlConnection(connectionString))
-            {
-                connection.Open();
-                using (var command = new NpgsqlCommand("SELECT * FROM device", connection))
-                {
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            yield return new Device(
-                                id: reader.GetInt32(0),
-                                model: reader.GetString(1),
-                                vid: reader.GetString(2),
-                                pid: reader.GetString(3),
-                                serialNumber: reader.GetString(4),
-                                inventoryNumber: reader.GetString(5)
-                            );
-                        }
-                    }
-                }
-            }
+            connection.Open();
         }
-
-        public Device GetById(int id)
+        catch (Exception e)
         {
-            using (var connection = new NpgsqlConnection(connectionString))
-            {
-                connection.Open();
-                using (var command = new NpgsqlCommand("SELECT * FROM device WHERE id = @id", connection))
-                {
-                    command.Parameters.AddWithValue("@id", id);
-                    using (var reader = command.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            return new Device(
-                                id: reader.GetInt32(0),
-                                model: reader.GetString(1),
-                                vid: reader.GetString(2),
-                                pid: reader.GetString(3),
-                                serialNumber: reader.GetString(4),
-                                inventoryNumber: reader.GetString(5)
-                            );
-                        }
-                        else
-                        {
-                            return null;
-                        }
-                    }
-                }
-            }
-        }
-
-        public void Update(Device entity)
-        {
-            throw new NotImplementedException();
+            throw new Exception("Fail to open database connection.", e);
         }
     }
 }
