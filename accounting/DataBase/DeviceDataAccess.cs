@@ -35,9 +35,22 @@ public class DeviceDataAccess : IDataAccess<Device>
         {
             command.ExecuteNonQuery();
         }
-        catch (Exception e)
+        catch (PostgresException e)
         {
-            throw new Exception("Fail to execute query.", e);
+            if (e.Code == "23505" && e.ConstraintName == "device_serial_number_key")
+            {
+                Console.WriteLine(
+                    "\nУстройство с таким серийным номером уже существует в базе данных." +
+                    "\nПожалуйста, повторите попытку с другим серийным номером.");
+            }
+            else
+            {
+                throw new Exception("Ошибка при выполнении запроса.", e);
+            }
+        }
+        finally
+        {
+            Console.ReadKey();
         }
     }
 
@@ -58,7 +71,28 @@ public class DeviceDataAccess : IDataAccess<Device>
         using var connection = new NpgsqlConnection(_connectionString);
         ConnectionOpen(connection);
 
-        using var command = new NpgsqlCommand("SELECT * FROM device", connection);
+        using var command = new NpgsqlCommand("SELECT * FROM device ORDER BY id", connection);
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+            yield return new Device(
+                reader.GetInt32(0),
+                reader.GetString(1),
+                reader.GetString(2),
+                reader.GetString(3),
+                reader.GetString(4),
+                reader.GetString(5)
+            );
+    }
+
+    public IEnumerable<Device> GetSomeLastRecords(int count)
+    {
+        using var connection = new NpgsqlConnection(_connectionString);
+        ConnectionOpen(connection);
+
+        using var command =
+            new NpgsqlCommand("SELECT * FROM (SELECT * FROM device ORDER BY id DESC LIMIT @count) AS T ORDER BY id ASC",
+                connection);
+        command.Parameters.AddWithValue("@count", count);
         using var reader = command.ExecuteReader();
         while (reader.Read())
             yield return new Device(

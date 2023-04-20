@@ -1,32 +1,85 @@
-﻿using accounting.DataBase;
-using accounting.Model;
+﻿using accounting.Model;
 
 namespace accounting.Controller;
 
-public class DeviceController
+public class DeviceController : IController
 {
-    private readonly DeviceDataAccess _deviceDataAccess;
+    private readonly IDataAccess<Device> _deviceDataAccess;
+    private readonly IView<Device> _deviceView;
 
-    public DeviceController()
+    public DeviceController(IDataAccess<Device> dataAccess, IView<Device> view)
     {
-        _deviceDataAccess = new DeviceDataAccess();
+        _deviceDataAccess = dataAccess;
+        _deviceView = view;
     }
 
-    public void HandleKeyPress(char key)
+    public void Start()
+    {
+        Console.Clear();
+        try
+        {
+            var _devices = _deviceDataAccess.GetAll();
+            var devices = new List<Device>();
+            foreach (var _device in _devices) devices.Add(_device);
+            // _deviceView.Show(devices);
+            // _deviceView.ShowById(devices, 1);
+            _deviceView.ShowLastRows(devices, 5);
+            String message = "A-Add, E-Edit, D-Delete, L-all device, I-show by ID. " +
+                             "\tM-Main Menu.\tCtrl+C - exit.";
+            _deviceView.ShowMessage(message);
+            ConsoleKey key = Console.ReadKey().Key;
+
+            switch (key)
+            {
+                case ConsoleKey.L:
+                    Show();
+                    break;
+                case ConsoleKey.I:
+                    ShowById();
+                    break;
+                case ConsoleKey.M:
+                    return;
+                default:
+                    HandleKeyPress(key);
+                    break;
+            }
+            // Sub method for show all devices.
+            void Show()
+            {
+                Console.Clear();
+                _deviceView.Show(devices);
+                Console.ReadKey();
+            }
+            // Sub method for show device by id.
+            void ShowById()
+            {
+                Console.Write("\nEnter device ID: \t\t");
+                var id = int.Parse(Console.ReadLine() ?? throw new InvalidOperationException());
+                _deviceView.ShowById(devices, id);
+                Console.ReadKey();
+            }
+        }
+        catch (Exception ex)
+        {
+            _deviceView.ShowError(ex.Message);
+        }
+    }
+
+    private void HandleKeyPress(ConsoleKey key)
     {
         switch (key)
         {
-            case 'a':
+            case ConsoleKey.A:
                 AddDevice();
                 break;
-            case 'e':
+            case ConsoleKey.E:
                 UpdateDevice();
                 break;
-            case 'r':
+            case ConsoleKey.D:
                 DeleteDevice();
                 break;
             default:
-                Console.WriteLine($"Invalid key: {key}. Please try again.");
+                Console.WriteLine($"Your choice: {key}.");
                 break;
         }
     }
@@ -34,31 +87,47 @@ public class DeviceController
     private void AddDevice()
     {
         Console.Write("\nEnter device ID: \t\t");
-        int id = Int32.Parse(Console.ReadLine() ?? throw new InvalidOperationException());
-
-        Console.Write("Enter device model: \t\t");
-        var model = Console.ReadLine();
-
-        Console.Write("Enter device VID: \t\t");
-        var vid = Console.ReadLine();
-
-        Console.Write("Enter device PID: \t\t");
-        var pid = Console.ReadLine();
-
-        Console.Write("Enter device serial number: \t");
-        var serialNumber = Console.ReadLine();
+        var id = int.Parse(Console.ReadLine() ?? throw new InvalidOperationException());
 
         Console.Write("Enter device inventory number: \t");
         var inventoryNumber = Console.ReadLine();
 
-        var device = new Device(id, model, vid, pid, serialNumber, inventoryNumber);
-        _deviceDataAccess.Add(device);
-        Console.WriteLine("Device added successfully.");
+        Console.Write("Add VID, PID, Model and Serial Number from connection USB-Flash.[Enter/Esc].\n");
+        while (true)
+        {
+            var keyInfo = Console.ReadKey(true);
+
+            if (keyInfo.Key == ConsoleKey.Enter)
+            {
+                var device = new Device(id, inventoryNumber);
+                _deviceDataAccess.Add(device);
+                break;
+            }
+
+            if (keyInfo.Key == ConsoleKey.Escape)
+            {
+                Console.Write("Enter device model: \t\t");
+                var model = Console.ReadLine();
+
+                Console.Write("Enter device VID: \t\t");
+                var vid = Console.ReadLine();
+
+                Console.Write("Enter device PID: \t\t");
+                var pid = Console.ReadLine();
+
+                Console.Write("Enter device serial number: \t");
+                var serialNumber = Console.ReadLine();
+
+                var device = new Device(id, model, vid, pid, serialNumber, inventoryNumber);
+                _deviceDataAccess.Add(device);
+                break;
+            }
+        }
     }
 
     private void UpdateDevice()
     {
-        Console.Write("\nEnter device ID to update: ");
+        Console.Write("\nEnter device ID to update\t\t\t\t:");
         var deviceId = int.Parse(Console.ReadLine());
 
         var device = _deviceDataAccess.GetById(deviceId);
@@ -68,19 +137,19 @@ public class DeviceController
             return;
         }
 
-        Console.Write("Enter device model: \t");
+        Console.Write($"Enter device model\t\t(Old value {device.Model})\t:");
         var model = Console.ReadLine();
 
-        Console.Write("Enter device VID: \t");
+        Console.Write($"Enter device VID\t\t(Old value {device.Vid})\t:");
         var vid = Console.ReadLine();
 
-        Console.Write("Enter device PID: \t");
+        Console.Write($"Enter device PID\t\t(Old value {device.Pid})\t:");
         var pid = Console.ReadLine();
 
-        Console.Write("Enter device serial number: \t");
+        Console.Write($"Enter device serial number\t(Old value {device.SerialNumber})\t:");
         var serialNumber = Console.ReadLine();
 
-        Console.Write("Enter device inventory number: \t");
+        Console.Write($"Enter device inventory number\t (Old value {device.InventoryNumber})\t:");
         var inventoryNumber = Console.ReadLine();
 
         device.Model = model;
@@ -89,8 +158,13 @@ public class DeviceController
         device.SerialNumber = serialNumber;
         device.InventoryNumber = inventoryNumber;
 
+        List<Device> _ = new List<Device>();
+        _.Add(device);
         _deviceDataAccess.Update(device);
+        _deviceView.ShowById(_, device.Id);
         Console.WriteLine("Device updated successfully.");
+
+        Console.ReadKey();
     }
 
     private void DeleteDevice()

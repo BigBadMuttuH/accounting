@@ -14,7 +14,7 @@ public class Device
     }
 
     // Конструктор с параметрами
-    public Device(int id, string model, string vid, string pid, string serialNumber, string inventoryNumber)
+    public Device(int id, string model, string vid, string pid, string serialNumber, string? inventoryNumber)
     {
         Id = id;
         Model = model;
@@ -24,12 +24,23 @@ public class Device
         InventoryNumber = inventoryNumber;
     }
 
+    public Device(int id, string? inventoryNumber)
+    {
+        Id = id;
+        Model = "";
+        Vid = "";
+        Pid = "";
+        SerialNumber = "";
+        InventoryNumber = inventoryNumber;
+        this.GetDeviceInformFromSystem();
+    }
+
     public int Id { get; set; } // Идентификатор в базе данных
     public string Model { get; set; } // Модель или производитель устройства
     public string Vid { get; set; } // Vendor ID (идентификатор производителя устройства)
     public string Pid { get; set; } // Product ID (идентификатор продукта устройства)
     public string SerialNumber { get; set; } // Серийный номер устройства
-    public string InventoryNumber { get; set; } // Инвентарный номер устройства
+    public string? InventoryNumber { get; set; } // Инвентарный номер устройства
 
     public override string ToString()
     {
@@ -39,7 +50,7 @@ public class Device
     /// <summary>
     ///     Получить информацию о подключенной флешке в OS Windows
     /// </summary>
-    public void GetDeviceInformFromSystem()
+    private void GetDeviceInformFromSystem()
     {
         // Получаем информацию о подключенных USB-устройствах
         var usbDevices =

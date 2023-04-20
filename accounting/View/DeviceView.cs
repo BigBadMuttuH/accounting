@@ -1,25 +1,48 @@
 ﻿using accounting.Model;
-using accounting.DataBase;
 using ConsoleTables;
-using System.Collections.Generic;
 
-namespace accounting.View
+namespace accounting.View;
+
+public class DeviceView : IView<Device>
 {
-
-
-
-    public class DeviceView
+    public void Show(List<Device> devices)
     {
-        public void PrintAllDevices()
+        var rows = ConsoleTable.From(devices);
+        rows.Write();
+    }
+
+    public void ShowLastRows(List<Device> devices, int n)
+    {
+        var rows = ConsoleTable.From(devices.Skip(Math.Max(0, devices.Count - n)))
+            .Configure(o => o.NumberAlignment = Alignment.Right);
+        rows.Write();
+    }
+
+    public void ShowById(List<Device> devices, int id)
+    {
+        var _ = devices.FirstOrDefault(d => d.Id == id);
+        if (_ != null)
         {
-            IDataAccess<Device> deviceDataAccess = new DeviceDataAccess();
-            var devices = deviceDataAccess.GetAll();
-            var table1 = new ConsoleTable("Инвентарный номер", "Модель", "Vendor ID\\Product ID", "Серийный номер");
-            foreach (Device device in devices)
-            {
-                table1.AddRow(device.InventoryNumber, device.Model, $"{device.Vid}\\{device.Pid}", device.SerialNumber);
-            }
-            table1.Write();
+            List<Device> device = new List<Device>();
+            device.Add(_);
+            var table = ConsoleTable.From<Device>(device)
+                .Configure(o => o.NumberAlignment = Alignment.Right);
+            table.Write();
         }
+        else
+        {
+            Console.WriteLine($"Device with ID {id} not found.");
+        }
+    }
+
+
+    public void ShowMessage(string message)
+    {
+        Console.WriteLine(message);
+    }
+
+    public void ShowError(string errorMessage)
+    {
+        throw new NotImplementedException();
     }
 }
