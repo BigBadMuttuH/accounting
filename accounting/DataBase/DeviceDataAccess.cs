@@ -5,21 +5,25 @@ namespace accounting.DataBase;
 
 public class DeviceDataAccess : IDataAccess<Device>
 {
-    public static PgSQLConnectionString ConnString = new()
-    {
-        Host = "localhost",
-        Port = "5432",
-        Database = "acl",
-        User = "postgres",
-        Password = "postgres"
-    };
+    private static readonly PgSQLConnection Conn = new();
 
-    private readonly string _connectionString = ConnString.ToString();
+    private readonly string _connectionString = Conn.ToString();
 
     public void Add(Device entity)
     {
         using var connection = new NpgsqlConnection(_connectionString);
         ConnectionOpen(connection);
+
+        if (IsDeviceExistsBySerialNumber(connection, entity.SerialNumber))
+        {
+            Console.WriteLine(
+                "\nУстройство с таким серийным номером уже существует в базе данных." +
+                "\nПожалуйста, повторите попытку с другим серийным номером.");
+            Console.ReadKey();
+            return;
+        }
+
+        IsNullOrWhiteSpaceEntity(entity);
 
         using var command =
             new NpgsqlCommand(
@@ -30,27 +34,15 @@ public class DeviceDataAccess : IDataAccess<Device>
         command.Parameters.AddWithValue("@vid", entity.Vid);
         command.Parameters.AddWithValue("@pid", entity.Pid);
         command.Parameters.AddWithValue("@serial_number", entity.SerialNumber);
-        command.Parameters.AddWithValue("@inventory_number", entity.InventoryNumber);
+        command.Parameters.AddWithValue("@inventory_number", entity.InventoryNumber!);
+
         try
         {
             command.ExecuteNonQuery();
         }
         catch (PostgresException e)
         {
-            if (e.Code == "23505" && e.ConstraintName == "device_serial_number_key")
-            {
-                Console.WriteLine(
-                    "\nУстройство с таким серийным номером уже существует в базе данных." +
-                    "\nПожалуйста, повторите попытку с другим серийным номером.");
-            }
-            else
-            {
-                throw new Exception("Ошибка при выполнении запроса.", e);
-            }
-        }
-        finally
-        {
-            Console.ReadKey();
+            throw new Exception("Ошибка при выполнении запроса.", e);
         }
     }
 
@@ -129,6 +121,18 @@ public class DeviceDataAccess : IDataAccess<Device>
     {
         using var connection = new NpgsqlConnection(_connectionString);
         ConnectionOpen(connection);
+
+        if (IsDeviceExistsBySerialNumber(connection, entity.SerialNumber))
+        {
+            Console.WriteLine(
+                "\nУстройство с таким серийным номером уже существует в базе данных." +
+                "\nПожалуйста, повторите попытку с другим серийным номером.");
+            Console.ReadKey();
+            return;
+        }
+
+        IsNullOrWhiteSpaceEntity(entity);
+
         using var command =
             new NpgsqlCommand(
                 "UPDATE device SET model = @model, vid = @vid, pid = @pid, serial_number = @serial_number, inventory_number = @inventory_number WHERE id = @id",
@@ -137,7 +141,7 @@ public class DeviceDataAccess : IDataAccess<Device>
         command.Parameters.AddWithValue("@vid", entity.Vid);
         command.Parameters.AddWithValue("@pid", entity.Pid);
         command.Parameters.AddWithValue("@serial_number", entity.SerialNumber);
-        command.Parameters.AddWithValue("@inventory_number", entity.InventoryNumber);
+        command.Parameters.AddWithValue("@inventory_number", entity.InventoryNumber!);
         command.Parameters.AddWithValue("@id", entity.Id);
 
         var rowsAffected = command.ExecuteNonQuery();
@@ -160,5 +164,23 @@ public class DeviceDataAccess : IDataAccess<Device>
         {
             throw new Exception("Fail to open database connection.", e);
         }
+    }
+
+    private bool IsDeviceExistsBySerialNumber(NpgsqlConnection connection, string serialNumber)
+    {
+        using var command =
+            new NpgsqlCommand("SELECT COUNT(*) FROM device WHERE serial_number = @serial_number", connection);
+        command.Parameters.AddWithValue("@serial_number", serialNumber);
+
+        return (long)command.ExecuteScalar()! > 0;
+    }
+
+    private void IsNullOrWhiteSpaceEntity(Device entity)
+    {
+        if (string.IsNullOrWhiteSpace(entity.InventoryNumber))
+            throw new ArgumentException("InventoryNumber не может быть пустым");
+
+        if (string.IsNullOrWhiteSpace(entity.SerialNumber))
+            throw new ArgumentException("SerialNumber не может быть пустым");
     }
 }

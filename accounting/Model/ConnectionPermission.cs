@@ -8,10 +8,9 @@
         public string RegistrationNumber { get; set; } // Регистрационный номер в системе ДО 
         public string Url { get; set; } // ссылка на http ресурс
 
-        public ConnectionPermission() { }
-
-        public ConnectionPermission(string permissionNumber, DateTime permissionDate, string registrationNumber, string url)
+        public ConnectionPermission(int id, string permissionNumber, DateTime permissionDate, string registrationNumber, string url)
         {
+            Id = id;
             PermissionNumber = permissionNumber;
             PermissionDate = permissionDate;
             RegistrationNumber = registrationNumber;

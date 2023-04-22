@@ -21,13 +21,13 @@ public class DeviceController : IController
             var _devices = _deviceDataAccess.GetAll();
             var devices = new List<Device>();
             foreach (var _device in _devices) devices.Add(_device);
-            // _deviceView.Show(devices);
-            // _deviceView.ShowById(devices, 1);
+
             _deviceView.ShowLastRows(devices, 5);
-            String message = "A-Add, E-Edit, D-Delete, L-all device, I-show by ID. " +
-                             "\tM-Main Menu.\tCtrl+C - exit.";
+            var message = "A-Add, E-Edit, D-Delete, L-all device, I-show by ID. " +
+                          "\tM-Main Menu.\tCtrl+C - exit.";
             _deviceView.ShowMessage(message);
-            ConsoleKey key = Console.ReadKey().Key;
+
+            var key = Console.ReadKey().Key;
 
             switch (key)
             {
@@ -43,6 +43,7 @@ public class DeviceController : IController
                     HandleKeyPress(key);
                     break;
             }
+
             // Sub method for show all devices.
             void Show()
             {
@@ -50,6 +51,7 @@ public class DeviceController : IController
                 _deviceView.Show(devices);
                 Console.ReadKey();
             }
+
             // Sub method for show device by id.
             void ShowById()
             {
@@ -101,6 +103,9 @@ public class DeviceController : IController
             {
                 var device = new Device(id, inventoryNumber);
                 _deviceDataAccess.Add(device);
+                string message = $"Device Added: {device}";
+                _deviceView.ShowMessage(message);
+                Console.ReadKey();
                 break;
             }
 
@@ -120,6 +125,9 @@ public class DeviceController : IController
 
                 var device = new Device(id, model, vid, pid, serialNumber, inventoryNumber);
                 _deviceDataAccess.Add(device);
+                string message = $"Device Added: {device}";
+                _deviceView.ShowMessage(message);
+                Console.ReadKey();
                 break;
             }
         }
@@ -158,7 +166,7 @@ public class DeviceController : IController
         device.SerialNumber = serialNumber;
         device.InventoryNumber = inventoryNumber;
 
-        List<Device> _ = new List<Device>();
+        var _ = new List<Device>();
         _.Add(device);
         _deviceDataAccess.Update(device);
         _deviceView.ShowById(_, device.Id);

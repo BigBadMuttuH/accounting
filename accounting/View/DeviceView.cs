@@ -43,6 +43,7 @@ public class DeviceView : IView<Device>
 
     public void ShowError(string errorMessage)
     {
-        throw new NotImplementedException();
+        Console.WriteLine(errorMessage);
+        Console.ReadKey();
     }
 }
