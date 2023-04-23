@@ -5,14 +5,14 @@ namespace accounting.Model
 {
     public class User
     {
-        public string Sid { get; set; }       // SID пользователя без домена
+        public int Sid { get; set; }       // SID пользователя без домена
         public string DisplayName { get; set; }
         public string Department { get; set; }
         public string SamAccountName { get; set; }
 
         public User() { }
 
-        public User(string sid, string displayName, string department, string samAccountName)
+        public User(int sid, string displayName, string department, string samAccountName)
         {
             Sid = sid;
             DisplayName = displayName;
@@ -38,7 +38,9 @@ namespace accounting.Model
                         if (result != null)
                         {
                             // Получаем свойства пользователя из Active Directory
-                            string sid = new SecurityIdentifier((byte[])result.Properties["objectSid"][0], 0).ToString();
+                            byte[] sidBytes = (byte[])result.Properties["objectSid"][0];
+                            int sid = BitConverter.ToInt32(sidBytes, 0);
+                            // int sid = new SecurityIdentifier((byte[])result.Properties["objectSid"][0], 0);
                             string displayName = result.Properties["displayName"][0].ToString();
                             string department = result.Properties.Contains("department") ? result.Properties["department"][0].ToString() : "";
                             string samAccountName = result.Properties["samaccountname"][0].ToString();
