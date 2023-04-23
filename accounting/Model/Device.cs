@@ -32,7 +32,7 @@ public class Device
         Pid = "";
         SerialNumber = "";
         InventoryNumber = inventoryNumber;
-        this.GetDeviceInformFromSystem();
+        GetDeviceInformFromSystem();
     }
 
     public int Id { get; set; } // Идентификатор в базе данных

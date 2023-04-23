@@ -1,8 +1,8 @@
 ﻿namespace accounting.DataBase;
 
-public class PgSQLConnection
+public class PgSqlConnection
 {
-    public PgSQLConnection()
+    public PgSqlConnection()
     {
         Host = "localhost";
         Port = "5432";

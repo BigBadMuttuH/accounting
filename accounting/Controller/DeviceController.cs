@@ -18,11 +18,11 @@ public class DeviceController : IController
         Console.Clear();
         try
         {
-            var _devices = _deviceDataAccess.GetAll();
-            var devices = new List<Device>();
-            foreach (var _device in _devices) devices.Add(_device);
+            var devices = _deviceDataAccess.GetAll();
+            var devicesList = new List<Device>();
+            foreach (var _ in devices) devicesList.Add(_);
 
-            _deviceView.ShowLastRows(devices, 5);
+            _deviceView.ShowLastRows(devicesList, 5);
             var message = "A-Add, E-Edit, D-Delete, L-all device, I-show by ID. " +
                           "\tM-Main Menu.\tCtrl+C - exit.";
             _deviceView.ShowMessage(message);
@@ -40,7 +40,7 @@ public class DeviceController : IController
                 case ConsoleKey.M:
                     return;
                 default:
-                    HandleKeyPress(key);
+                    this.HandleKeyPress(key);
                     break;
             }
 
@@ -48,7 +48,7 @@ public class DeviceController : IController
             void Show()
             {
                 Console.Clear();
-                _deviceView.Show(devices);
+                _deviceView.Show(devicesList);
                 Console.ReadKey();
             }
 
@@ -56,8 +56,9 @@ public class DeviceController : IController
             void ShowById()
             {
                 Console.Write("\nEnter device ID: \t\t");
-                var id = int.Parse(Console.ReadLine() ?? throw new InvalidOperationException());
-                _deviceView.ShowById(devices, id);
+                int.TryParse(Console.ReadLine(), out var id);
+                id = id != 0 ? id : 0;
+                _deviceView.ShowById(devicesList, id);
                 Console.ReadKey();
             }
         }
@@ -67,29 +68,11 @@ public class DeviceController : IController
         }
     }
 
-    private void HandleKeyPress(ConsoleKey key)
-    {
-        switch (key)
-        {
-            case ConsoleKey.A:
-                AddDevice();
-                break;
-            case ConsoleKey.E:
-                UpdateDevice();
-                break;
-            case ConsoleKey.D:
-                DeleteDevice();
-                break;
-            default:
-                Console.WriteLine($"Your choice: {key}.");
-                break;
-        }
-    }
-
-    private void AddDevice()
+    public void Add()
     {
         Console.Write("\nEnter device ID: \t\t");
-        var id = int.Parse(Console.ReadLine() ?? throw new InvalidOperationException());
+        int.TryParse(Console.ReadLine(), out var id);
+        id = id != 0 ? id : 0;
 
         Console.Write("Enter device inventory number: \t");
         var inventoryNumber = Console.ReadLine();
@@ -102,8 +85,9 @@ public class DeviceController : IController
             if (keyInfo.Key == ConsoleKey.Enter)
             {
                 var device = new Device(id, inventoryNumber);
+                IsNullOrWhiteSpaceEntity(device);
                 _deviceDataAccess.Add(device);
-                string message = $"Device Added: {device}";
+                var message = $"Device Added: {device}";
                 _deviceView.ShowMessage(message);
                 Console.ReadKey();
                 break;
@@ -124,8 +108,9 @@ public class DeviceController : IController
                 var serialNumber = Console.ReadLine();
 
                 var device = new Device(id, model, vid, pid, serialNumber, inventoryNumber);
+                IsNullOrWhiteSpaceEntity(device);
                 _deviceDataAccess.Add(device);
-                string message = $"Device Added: {device}";
+                var message = $"Device Added: {device}";
                 _deviceView.ShowMessage(message);
                 Console.ReadKey();
                 break;
@@ -133,15 +118,18 @@ public class DeviceController : IController
         }
     }
 
-    private void UpdateDevice()
+    public void Update()
     {
         Console.Write("\nEnter device ID to update\t\t\t\t:");
-        var deviceId = int.Parse(Console.ReadLine());
+        int.TryParse(Console.ReadLine(), out var id);
+        id = id != 0 ? id : 0;
+        if (id <=0 || string.IsNullOrWhiteSpace(id.ToString()))
+            throw new ArithmeticException("ID не можежет быть 0, отрицательным или пустым.");
 
-        var device = _deviceDataAccess.GetById(deviceId);
+        var device = _deviceDataAccess.GetById(id);
         if (device == null)
         {
-            Console.WriteLine($"Device with ID {deviceId} not found.");
+            Console.WriteLine($"Device with ID {id} not found.");
             return;
         }
 
@@ -166,8 +154,7 @@ public class DeviceController : IController
         device.SerialNumber = serialNumber;
         device.InventoryNumber = inventoryNumber;
 
-        var _ = new List<Device>();
-        _.Add(device);
+        var _ = new List<Device> { device };
         _deviceDataAccess.Update(device);
         _deviceView.ShowById(_, device.Id);
         Console.WriteLine("Device updated successfully.");
@@ -175,19 +162,30 @@ public class DeviceController : IController
         Console.ReadKey();
     }
 
-    private void DeleteDevice()
+    public void Delete()
     {
         Console.Write("\nEnter device ID to delete: ");
-        var deviceId = int.Parse(Console.ReadLine());
+        int.TryParse(Console.ReadLine(), out var id);
+        id = id != 0 ? id : 0;
+        if (id <=0 || string.IsNullOrWhiteSpace(id.ToString()))
+            throw new ArithmeticException("ID must be grate then 0 and not be null.");
 
         try
         {
-            _deviceDataAccess.Delete(deviceId);
+            _deviceDataAccess.Delete(id);
             Console.WriteLine("Device deleted successfully.");
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
         }
+    }
+    private void IsNullOrWhiteSpaceEntity(Device entity)
+    {
+        if (entity.Id <=0 || string.IsNullOrWhiteSpace(entity.Id.ToString()))
+            throw new ArithmeticException("ID must be grate then 0 and not be null.");
+
+        if (string.IsNullOrWhiteSpace(entity.SerialNumber))
+            throw new ArgumentException("Serial Number cannot be empty.");
     }
 }

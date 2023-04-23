@@ -5,7 +5,7 @@ namespace accounting.DataBase;
 
 public class DeviceDataAccess : IDataAccess<Device>
 {
-    private static readonly PgSQLConnection Conn = new();
+    private static readonly PgSqlConnection Conn = new();
 
     private readonly string _connectionString = Conn.ToString();
 
@@ -27,7 +27,7 @@ public class DeviceDataAccess : IDataAccess<Device>
 
         using var command =
             new NpgsqlCommand(
-                "INSERT INTO device (id, model, vid, pid, serial_number, inventory_number) VALUES (@id, @model, @vid, @pid, @serial_number, @inventory_number)",
+                "INSERT INTO device VALUES (@id, @model, @vid, @pid, @serial_number, @inventory_number)",
                 connection);
         command.Parameters.AddWithValue("@id", entity.Id);
         command.Parameters.AddWithValue("@model", entity.Model);
@@ -135,7 +135,13 @@ public class DeviceDataAccess : IDataAccess<Device>
 
         using var command =
             new NpgsqlCommand(
-                "UPDATE device SET model = @model, vid = @vid, pid = @pid, serial_number = @serial_number, inventory_number = @inventory_number WHERE id = @id",
+                "UPDATE device SET " +
+                "model = @model, " +
+                "vid = @vid, " +
+                "pid = @pid, " +
+                "serial_number = @serial_number, " +
+                "inventory_number = @inventory_number " +
+                "WHERE id = @id",
                 connection);
         command.Parameters.AddWithValue("@model", entity.Model);
         command.Parameters.AddWithValue("@vid", entity.Vid);
@@ -149,11 +155,6 @@ public class DeviceDataAccess : IDataAccess<Device>
             throw new Exception("No rows updated. Device with given Id does not exist in the database.");
     }
 
-    /// <summary>
-    ///     Trying open connection to DataBase
-    /// </summary>
-    /// <param name="connection"></param>
-    /// <exception cref="Exception"></exception>
     private static void ConnectionOpen(NpgsqlConnection connection)
     {
         try
@@ -177,6 +178,8 @@ public class DeviceDataAccess : IDataAccess<Device>
 
     private void IsNullOrWhiteSpaceEntity(Device entity)
     {
+        if (entity.Id <=0 || string.IsNullOrWhiteSpace(entity.Id.ToString()))
+            throw new ArithmeticException("ID не можежет быть 0, отрицательным или пустым.");
         if (string.IsNullOrWhiteSpace(entity.InventoryNumber))
             throw new ArgumentException("InventoryNumber не может быть пустым");
 

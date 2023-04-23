@@ -11,9 +11,9 @@ public class DeviceView : IView<Device>
         rows.Write();
     }
 
-    public void ShowLastRows(List<Device> devices, int n)
+    public void ShowLastRows(List<Device> connectionPermissions, int n)
     {
-        var rows = ConsoleTable.From(devices.Skip(Math.Max(0, devices.Count - n)))
+        var rows = ConsoleTable.From(connectionPermissions.Skip(Math.Max(0, connectionPermissions.Count - n)))
             .Configure(o => o.NumberAlignment = Alignment.Right);
         rows.Write();
     }
@@ -33,17 +33,5 @@ public class DeviceView : IView<Device>
         {
             Console.WriteLine($"Device with ID {id} not found.");
         }
-    }
-
-
-    public void ShowMessage(string message)
-    {
-        Console.WriteLine(message);
-    }
-
-    public void ShowError(string errorMessage)
-    {
-        Console.WriteLine(errorMessage);
-        Console.ReadKey();
     }
 }
