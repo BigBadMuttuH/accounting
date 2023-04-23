@@ -9,10 +9,11 @@ while (true)
     //var deviceDataAccess = new DeviceDataAccess();
     //var deviceController = new DeviceController(deviceDataAccess, deviceView);
     //deviceController.Start();
+
+
     var connectionPermissionView = new ConnectionPermissionView();
     var connectionPermissionDataAccess = new ConnectionPermissionDataAccess();
     var connectionPermissionController =
         new ConnectionPermissionController(connectionPermissionDataAccess, connectionPermissionView);
-
     connectionPermissionController.Start();
 }

@@ -11,9 +11,9 @@ public class ConnectionPermissionView : IView<ConnectionPermission>
         rows.Write();
     }
 
-    public void ShowLastRows(List<ConnectionPermission> connectionPermissions, int n)
+    public void ShowLastRows(List<ConnectionPermission> devices, int n)
     {
-        var rows = ConsoleTable.From(connectionPermissions.Skip(Math.Max(0, connectionPermissions.Count - n)))
+        var rows = ConsoleTable.From(devices.Skip(Math.Max(0, devices.Count - n)))
             .Configure(o => o.NumberAlignment = Alignment.Right);
         rows.Write();
     }
@@ -30,8 +30,9 @@ public class ConnectionPermissionView : IView<ConnectionPermission>
         }
         else
         {
-            Console.WriteLine($"Device with ID {id} not found.");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"Permission with ID {id} not found.");
+            Console.ResetColor();
         }
-
     }
 }

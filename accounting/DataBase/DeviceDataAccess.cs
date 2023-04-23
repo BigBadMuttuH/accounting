@@ -1,4 +1,5 @@
 ﻿using accounting.Model;
+using accounting.View;
 using Npgsql;
 
 namespace accounting.DataBase;
@@ -9,6 +10,8 @@ public class DeviceDataAccess : IDataAccess<Device>
 
     private readonly string _connectionString = Conn.ToString();
 
+    private readonly IView<Device> _deviceView = new DeviceView();
+
     public void Add(Device entity)
     {
         using var connection = new NpgsqlConnection(_connectionString);
@@ -16,14 +19,11 @@ public class DeviceDataAccess : IDataAccess<Device>
 
         if (IsDeviceExistsBySerialNumber(connection, entity.SerialNumber))
         {
-            Console.WriteLine(
-                "\nУстройство с таким серийным номером уже существует в базе данных." +
-                "\nПожалуйста, повторите попытку с другим серийным номером.");
-            Console.ReadKey();
+            _deviceView.ShowError(
+                $"\nA device with this serial number:{entity.SerialNumber} already exists in the database." +
+                "\nPlease try again with a different serial number.");
             return;
         }
-
-        IsNullOrWhiteSpaceEntity(entity);
 
         using var command =
             new NpgsqlCommand(
@@ -42,7 +42,8 @@ public class DeviceDataAccess : IDataAccess<Device>
         }
         catch (PostgresException e)
         {
-            throw new Exception("Ошибка при выполнении запроса.", e);
+            _deviceView.ShowError("Error execute query");
+            _deviceView.ShowError(e.MessageText);
         }
     }
 
@@ -55,7 +56,8 @@ public class DeviceDataAccess : IDataAccess<Device>
 
         var rowsAffected = command.ExecuteNonQuery();
 
-        if (rowsAffected == 0) throw new Exception($"No device found with id {id}");
+        if (rowsAffected == 0)
+            _deviceView.ShowError($"No device found with id {id}");
     }
 
     public IEnumerable<Device> GetAll()
@@ -124,14 +126,11 @@ public class DeviceDataAccess : IDataAccess<Device>
 
         if (IsDeviceExistsBySerialNumber(connection, entity.SerialNumber))
         {
-            Console.WriteLine(
-                "\nУстройство с таким серийным номером уже существует в базе данных." +
-                "\nПожалуйста, повторите попытку с другим серийным номером.");
-            Console.ReadKey();
+            _deviceView.ShowError(
+                $"\nA device with this serial number:{entity.SerialNumber} already exists in the database." +
+                "\nPlease try again with a different serial number.");
             return;
         }
-
-        IsNullOrWhiteSpaceEntity(entity);
 
         using var command =
             new NpgsqlCommand(
@@ -152,7 +151,7 @@ public class DeviceDataAccess : IDataAccess<Device>
 
         var rowsAffected = command.ExecuteNonQuery();
         if (rowsAffected == 0)
-            throw new Exception("No rows updated. Device with given Id does not exist in the database.");
+            _deviceView.ShowError("No rows updated. Device with given Id does not exist in the database.");
     }
 
     private static void ConnectionOpen(NpgsqlConnection connection)
@@ -174,16 +173,5 @@ public class DeviceDataAccess : IDataAccess<Device>
         command.Parameters.AddWithValue("@serial_number", serialNumber);
 
         return (long)command.ExecuteScalar()! > 0;
-    }
-
-    private void IsNullOrWhiteSpaceEntity(Device entity)
-    {
-        if (entity.Id <=0 || string.IsNullOrWhiteSpace(entity.Id.ToString()))
-            throw new ArithmeticException("ID не можежет быть 0, отрицательным или пустым.");
-        if (string.IsNullOrWhiteSpace(entity.InventoryNumber))
-            throw new ArgumentException("InventoryNumber не может быть пустым");
-
-        if (string.IsNullOrWhiteSpace(entity.SerialNumber))
-            throw new ArgumentException("SerialNumber не может быть пустым");
     }
 }

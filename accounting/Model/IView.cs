@@ -3,7 +3,7 @@
 public interface IView<T>
 {
     void Show(List<T> entities);
-    void ShowLastRows(List<T> connectionPermissions, int n);
+    void ShowLastRows(List<T> devices, int n);
     void ShowById(List<T> entities, int id);
 
     public void ShowMessage(string message)
@@ -13,7 +13,9 @@ public interface IView<T>
 
     public void ShowError(string errorMessage)
     {
+        Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine(errorMessage);
+        Console.ResetColor();
         Console.ReadKey();
     }
 }

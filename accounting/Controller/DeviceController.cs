@@ -8,10 +8,7 @@ public class DeviceController : IController
     private readonly IView<Device> _deviceView;
 
     public DeviceController(IDataAccess<Device> dataAccess, IView<Device> view)
-    {
-        _deviceDataAccess = dataAccess;
-        _deviceView = view;
-    }
+        => (_deviceDataAccess, _deviceView) = (dataAccess, view);
 
     public void Start()
     {
@@ -55,9 +52,7 @@ public class DeviceController : IController
             // Sub method for show device by id.
             void ShowById()
             {
-                Console.Write("\nEnter device ID: \t\t");
-                int.TryParse(Console.ReadLine(), out var id);
-                id = id != 0 ? id : 0;
+                if (GetId(out var id)) return;
                 _deviceView.ShowById(devicesList, id);
                 Console.ReadKey();
             }
@@ -70,9 +65,7 @@ public class DeviceController : IController
 
     public void Add()
     {
-        Console.Write("\nEnter device ID: \t\t");
-        int.TryParse(Console.ReadLine(), out var id);
-        id = id != 0 ? id : 0;
+        if (GetId(out var id)) return;
 
         Console.Write("Enter device inventory number: \t");
         var inventoryNumber = Console.ReadLine();
@@ -120,16 +113,12 @@ public class DeviceController : IController
 
     public void Update()
     {
-        Console.Write("\nEnter device ID to update\t\t\t\t:");
-        int.TryParse(Console.ReadLine(), out var id);
-        id = id != 0 ? id : 0;
-        if (id <=0 || string.IsNullOrWhiteSpace(id.ToString()))
-            throw new ArithmeticException("ID не можежет быть 0, отрицательным или пустым.");
+        if (GetId(out var id)) return;
 
         var device = _deviceDataAccess.GetById(id);
         if (device == null)
         {
-            Console.WriteLine($"Device with ID {id} not found.");
+            _deviceView.ShowError($"Device with ID {id} not found.");
             return;
         }
 
@@ -157,35 +146,35 @@ public class DeviceController : IController
         var _ = new List<Device> { device };
         _deviceDataAccess.Update(device);
         _deviceView.ShowById(_, device.Id);
-        Console.WriteLine("Device updated successfully.");
-
+        _deviceView.ShowMessage("Device updated successfully.");
         Console.ReadKey();
     }
 
     public void Delete()
     {
-        Console.Write("\nEnter device ID to delete: ");
-        int.TryParse(Console.ReadLine(), out var id);
-        id = id != 0 ? id : 0;
-        if (id <=0 || string.IsNullOrWhiteSpace(id.ToString()))
-            throw new ArithmeticException("ID must be grate then 0 and not be null.");
+        if (GetId(out var id)) return;
 
         try
         {
             _deviceDataAccess.Delete(id);
-            Console.WriteLine("Device deleted successfully.");
+            _deviceView.ShowMessage("Device deleted successfully.");
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            _deviceView.ShowMessage(ex.Message);
         }
+    }
+    private bool GetId(out int id)
+    {
+        Console.Write("\nEnter Device ID: \t\t");
+        int.TryParse(Console.ReadLine(), out id);
+        if (id > 0) return false;
+        _deviceView.ShowError("ID must be grate then 0 and not be null.");
+        return true;
     }
     private void IsNullOrWhiteSpaceEntity(Device entity)
     {
-        if (entity.Id <=0 || string.IsNullOrWhiteSpace(entity.Id.ToString()))
-            throw new ArithmeticException("ID must be grate then 0 and not be null.");
-
         if (string.IsNullOrWhiteSpace(entity.SerialNumber))
-            throw new ArgumentException("Serial Number cannot be empty.");
+            _deviceView.ShowError("Serial Number cannot be empty.");
     }
 }

@@ -7,43 +7,78 @@ public class ConnectionPermissionController : IController
     private readonly IDataAccess<ConnectionPermission> _connectionPermissionDataAccess;
     private readonly IView<ConnectionPermission> _connectionPermissionView;
 
-    public ConnectionPermissionController(IDataAccess<ConnectionPermission> dataAccess, IView<ConnectionPermission> view)
-        => (_connectionPermissionDataAccess, _connectionPermissionView) = (dataAccess, view);
+    public ConnectionPermissionController(IDataAccess<ConnectionPermission> dataAccess,
+        IView<ConnectionPermission> view) => (_connectionPermissionDataAccess, _connectionPermissionView) = (dataAccess, view);
 
     public void Start()
     {
         Console.Clear();
-        var connectionPermissions = _connectionPermissionDataAccess.GetAll();
-        var connectionPermissionList = new List<ConnectionPermission>();
-        foreach (var _ in connectionPermissions) connectionPermissionList.Add(_);
+        try
+        {
+            var connectionPermissions = _connectionPermissionDataAccess.GetAll();
+            var connectionPermissionList = new List<ConnectionPermission>();
+            foreach (var _ in connectionPermissions) connectionPermissionList.Add(_);
 
-        _connectionPermissionView.ShowLastRows(connectionPermissionList, 5);
+            _connectionPermissionView.ShowLastRows(connectionPermissionList, 5);
 
-        var message = "A-Add, E-Edit, D-Delete, L-all Permissions, I-show by ID. " +
-                      "\tM-Main Menu.\tCtrl+C - exit.";
-        _connectionPermissionView.ShowMessage(message);
-        var key = Console.ReadKey().Key;
-        this.HandleKeyPress(key);
+            var message = "A-Add, E-Edit, D-Delete, L-all Permissions, I-show by ID. " +
+                          "\tM-Main Menu.\tCtrl+C - exit.";
+            _connectionPermissionView.ShowMessage(message);
+            var key = Console.ReadKey().Key;
+
+            switch (key)
+            {
+                case ConsoleKey.L:
+                    Show();
+                    break;
+                case ConsoleKey.I:
+                    ShowById();
+                    break;
+                case ConsoleKey.M:
+                    return;
+                default:
+                    this.HandleKeyPress(key);
+                    break;
+            }
+
+            // Sub method for show all devices.
+            void Show()
+            {
+                Console.Clear();
+                _connectionPermissionView.Show(connectionPermissionList);
+                Console.ReadKey();
+            }
+
+            // Sub method for show device by id.
+            void ShowById()
+            {
+                if (GetId(out var id)) return;
+                _connectionPermissionView.ShowById(connectionPermissionList, id);
+                Console.ReadKey();
+            }
+        }
+        catch (Exception ex)
+        {
+            _connectionPermissionView.ShowError(ex.Message);
+        }
     }
 
     public void Add()
     {
-        Console.Write("\nEnter Permission ID: \t\t");
-        int.TryParse(Console.ReadLine(), out var id);
-        id = id != 0 ? id : 0;
+        if (GetId(out var id)) return;
 
-        Console.Write("Enter Permission number: \t");
+        Console.Write("Enter Permission number: \t\t");
         var permissionNumber = Console.ReadLine();
 
-        Console.Write("Enter permission date: \t\t");
+        Console.Write("Enter permission date: \t\t\t");
         var permissionDate = DateTime.Parse(Console.ReadLine() ?? string.Empty);
 
-        Console.Write("Enter permission registration number: \t\t");
+        Console.Write("Enter permission registration number: \t");
         var registrationNumber = Console.ReadLine();
 
-        Console.Write("Enter permission url: \t\t");
+        Console.Write("Enter permission url: \t\t\t");
         var url = Console.ReadLine();
-        
+
         var connectionPermission =
             new ConnectionPermission(id, permissionNumber, permissionDate, registrationNumber, url);
 
@@ -55,16 +90,15 @@ public class ConnectionPermissionController : IController
         Console.ReadKey();
     }
 
+
     public void Update()
     {
-        Console.Write("\nEnter Permission ID to update\t\t\t\t:");
-        int.TryParse(Console.ReadLine(), out var id);
-        id = id != 0 ? id : 0;
+        if (GetId(out var id)) return;
 
         var connectionPermission = _connectionPermissionDataAccess.GetById(id);
         if (connectionPermission == null)
         {
-            Console.WriteLine($"Permission with ID {id} not found.");
+            _connectionPermissionView.ShowError($"Permission with ID {id} not found.");
             return;
         }
 
@@ -95,9 +129,7 @@ public class ConnectionPermissionController : IController
 
     public void Delete()
     {
-        Console.Write("\nEnter Permission ID to delete: ");
-        int.TryParse(Console.ReadLine(), out var id);
-        id = id != 0 ? id : 0;
+        if (GetId(out var id)) return;
 
         try
         {
@@ -109,11 +141,20 @@ public class ConnectionPermissionController : IController
             Console.WriteLine(ex.Message);
         }
     }
+
+    private bool GetId(out int id)
+    {
+        Console.Write("\nEnter Permission ID: \t\t\t");
+        int.TryParse(Console.ReadLine(), out id);
+        if (id > 0) return false;
+
+        const string errorMessage = "ID must be grate then 0 and not be null.";
+        _connectionPermissionView.ShowError(errorMessage);
+        return true;
+    }
+
     private void IsNullOrWhiteSpaceEntity(ConnectionPermission entity)
     {
-        if (entity.Id <=0 || string.IsNullOrWhiteSpace(entity.Id.ToString()))
-            throw new ArgumentException("ID must be grate then 0 and not be null.");
-
         if (string.IsNullOrWhiteSpace(entity.PermissionNumber))
             throw new ArgumentException("Permission Number cannot be empty.");
     }

@@ -1,4 +1,5 @@
 ﻿using accounting.Model;
+using accounting.View;
 using Npgsql;
 
 namespace accounting.DataBase;
@@ -6,6 +7,8 @@ namespace accounting.DataBase;
 public class ConnectionPermissionDataAccess : IDataAccess<ConnectionPermission>
 {
     private static readonly PgSqlConnection ConnString = new();
+
+    private readonly IView<ConnectionPermission> _connectionPermissionView = new ConnectionPermissionView();
 
     private readonly string _connectionString = ConnString.ToString();
 
@@ -87,7 +90,8 @@ public class ConnectionPermissionDataAccess : IDataAccess<ConnectionPermission>
         }
         catch (PostgresException e)
         {
-            throw new Exception("Ошибка при выполнении запроса.", e);
+            _connectionPermissionView.ShowError("Error execute query");
+            _connectionPermissionView.ShowError(e.MessageText);
         }
     }
 
@@ -114,7 +118,8 @@ public class ConnectionPermissionDataAccess : IDataAccess<ConnectionPermission>
 
         var rowsAffected = command.ExecuteNonQuery();
         if (rowsAffected == 0)
-            throw new Exception("No rows updated. Connection permission with given Id does not exist in the database.");
+            _connectionPermissionView.ShowError($"No rows updated. \n" +
+                                                $"Connection permission with given Id{entity.Id} does not exist in the database.");
     }
 
     public void Delete(int id)
@@ -126,7 +131,8 @@ public class ConnectionPermissionDataAccess : IDataAccess<ConnectionPermission>
 
         var rowsAffected = command.ExecuteNonQuery();
 
-        if (rowsAffected == 0) throw new Exception($"No connection permission found with id {id}");
+        if (rowsAffected == 0)
+            _connectionPermissionView.ShowError($"No connection permission found with id {id}");
     }
 
     private static void ConnectionOpen(NpgsqlConnection connection)
