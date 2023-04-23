@@ -23,9 +23,9 @@ public class DeviceView : IView<Device>
         var _ = devices.FirstOrDefault(d => d.Id == id);
         if (_ != null)
         {
-            List<Device> device = new List<Device>();
+            var device = new List<Device>();
             device.Add(_);
-            var table = ConsoleTable.From<Device>(device)
+            var table = ConsoleTable.From(device)
                 .Configure(o => o.NumberAlignment = Alignment.Right);
             table.Write();
         }

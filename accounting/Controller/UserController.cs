@@ -2,7 +2,7 @@
 
 namespace accounting.Controller;
 
-public class AccountingController : IController
+public class UserController : IController
 {
     public void Start()
     {

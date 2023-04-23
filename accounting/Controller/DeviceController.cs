@@ -8,7 +8,9 @@ public class DeviceController : IController
     private readonly IView<Device> _deviceView;
 
     public DeviceController(IDataAccess<Device> dataAccess, IView<Device> view)
-        => (_deviceDataAccess, _deviceView) = (dataAccess, view);
+    {
+        (_deviceDataAccess, _deviceView) = (dataAccess, view);
+    }
 
     public void Start()
     {
@@ -164,6 +166,7 @@ public class DeviceController : IController
             _deviceView.ShowMessage(ex.Message);
         }
     }
+
     private bool GetId(out int id)
     {
         Console.Write("\nEnter Device ID: \t\t");
@@ -172,6 +175,7 @@ public class DeviceController : IController
         _deviceView.ShowError("ID must be grate then 0 and not be null.");
         return true;
     }
+
     private void IsNullOrWhiteSpaceEntity(Device entity)
     {
         if (string.IsNullOrWhiteSpace(entity.SerialNumber))

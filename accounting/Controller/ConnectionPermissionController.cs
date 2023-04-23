@@ -8,7 +8,10 @@ public class ConnectionPermissionController : IController
     private readonly IView<ConnectionPermission> _connectionPermissionView;
 
     public ConnectionPermissionController(IDataAccess<ConnectionPermission> dataAccess,
-        IView<ConnectionPermission> view) => (_connectionPermissionDataAccess, _connectionPermissionView) = (dataAccess, view);
+        IView<ConnectionPermission> view)
+    {
+        (_connectionPermissionDataAccess, _connectionPermissionView) = (dataAccess, view);
+    }
 
     public void Start()
     {
