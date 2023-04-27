@@ -7,8 +7,9 @@
         public int DeviceId { get; set; }
         public int ConnectionPermissionId { get; set; }
 
-        public Accounting(int userId, int deviceId, int connectionPermissionId)
+        public Accounting(int id, int userId, int deviceId, int connectionPermissionId)
         {
+            Id = id;
             UserId = userId;
             DeviceId = deviceId;
             ConnectionPermissionId = connectionPermissionId;

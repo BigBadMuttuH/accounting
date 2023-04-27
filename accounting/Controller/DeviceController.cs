@@ -105,7 +105,7 @@ public class DeviceController : IController
                 var device = new Device(id, model, vid, pid, serialNumber, inventoryNumber);
                 IsNullOrWhiteSpaceEntity(device);
                 _deviceDataAccess.Add(device);
-                var message = $"Device Added: {device}";
+                var message = $"Device added: {device}";
                 _deviceView.ShowMessage(message);
                 Console.ReadKey();
                 break;

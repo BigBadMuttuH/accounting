@@ -3,7 +3,7 @@
 public interface IView<T>
 {
     void Show(List<T> entities);
-    void ShowLastRows(List<T> devices, int n);
+    void ShowLastRows(List<T> entities, int n);
     void ShowById(List<T> entities, int id);
 
     public void ShowMessage(string message)

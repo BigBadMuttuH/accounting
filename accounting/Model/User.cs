@@ -6,9 +6,9 @@ namespace accounting.Model
     public class User
     {
         public int Sid { get; set; }       // SID пользователя без домена
-        public string DisplayName { get; set; }
-        public string Department { get; set; }
-        public string SamAccountName { get; set; }
+        public string DisplayName { get; set; } = null!;
+        public string Department { get; set; } = null!;
+        public string SamAccountName { get; set; } = null!;
 
         public User() { }
 
@@ -19,8 +19,12 @@ namespace accounting.Model
             Department = department;
             SamAccountName = samAccountName;
         }
+        public User(string? samAccountName)
+        {
+            this.GetUserFromActiveDirectory(samAccountName);
+        }
 
-        public static User GetUserFromActiveDirectory(string userName)
+        public User? GetUserFromActiveDirectory(string? userName)
         {
             Config config = new Config();
 
