@@ -16,11 +16,14 @@ public class AccountingController : IController
     public void Start()
     {
         Console.Clear();
+        Console.WriteLine("Downloading data from Database. Wait please.");
         try
         {
             var accounting = _accountingDataAccess.GetAll();
             var accountingList = new List<Accounting>();
             foreach (var _ in accounting) accountingList.Add(_);
+
+            Console.Clear();
 
             _accountingView.ShowLastRows(accountingList, 5);
             var message = "A-Add, E-Edit, D-Delete, L-all records, I-show by ID. " +

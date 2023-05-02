@@ -5,6 +5,7 @@ public class Accounting
     public Accounting(int id, User user, Device device, ConnectionPermission connectionPermission,
         ConnectionPermission disconnectionPermission)
     {
+        Id = id;
         User = user;
         Device = device;
         ConnectionPermission = connectionPermission;

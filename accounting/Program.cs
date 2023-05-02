@@ -2,6 +2,7 @@
 using accounting.DataBase;
 using accounting.View;
 
+Console.WriteLine("Initializing...");
 while (true)
 {
     //var deviceView = new DeviceView();
@@ -20,8 +21,8 @@ while (true)
     // var userController = new UserController(userDataAccess, userView);
     // userController.Start();
 
-    var accontingView = new AccountingView();
+    var accountingView = new AccountingView();
     var accountingDataAccess = new AccountingDataAccess();
-    var accountingController = new AccountingController(accountingDataAccess, accontingView);
+    var accountingController = new AccountingController(accountingDataAccess, accountingView);
     accountingController.Start();
 }

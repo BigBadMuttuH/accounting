@@ -24,7 +24,7 @@ public class AccountingDataAccess : IDataAccess<Accounting>
 
         while (reader.Read())
         {
-            var accountingId = reader.GetInt32(0);
+            var id = reader.GetInt32(0);
             var userId = reader.GetInt32(1);
             var deviceId = reader.GetInt32(2);
             var connectionPermissionId = reader.GetInt32(3);
@@ -49,8 +49,8 @@ public class AccountingDataAccess : IDataAccess<Accounting>
                 "",
                 "",
                 "",
-                inventoryNumber,
-                serialNumber);
+                serialNumber,
+                inventoryNumber);
             var connectionPermission = new ConnectionPermission(
                 connectionPermissionId,
                 connectionPermissionNumber,
@@ -66,7 +66,7 @@ public class AccountingDataAccess : IDataAccess<Accounting>
                     disconnectionPermissionUrl)
                 : new ConnectionPermission();
 
-            yield return new Accounting(accountingId, user, device, connectionPermission, disconnectionPermission);
+            yield return new Accounting(id, user, device, connectionPermission, disconnectionPermission);
         }
     }
 
