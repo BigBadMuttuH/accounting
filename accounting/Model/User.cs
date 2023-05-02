@@ -1,5 +1,7 @@
 ﻿using System.DirectoryServices;
+using System.Security.Cryptography;
 using System.Security.Principal;
+using Microsoft.VisualBasic.CompilerServices;
 
 namespace accounting.Model
 {
@@ -27,6 +29,7 @@ namespace accounting.Model
         public User? GetUserFromActiveDirectory(string? userName)
         {
             Config config = new Config();
+            config.Domain = "regions.eais.customs.ru";
 
             // Выполняем поиск пользователя в Active Directory
             using (var root = new DirectoryEntry("LDAP://RootDSE"))
@@ -42,9 +45,13 @@ namespace accounting.Model
                         if (result != null)
                         {
                             // Получаем свойства пользователя из Active Directory
-                            byte[] sidBytes = (byte[])result.Properties["objectSid"][0];
-                            int sid = BitConverter.ToInt32(sidBytes, 0);
-                            // int sid = new SecurityIdentifier((byte[])result.Properties["objectSid"][0], 0);
+                            string[] sidPars = new SecurityIdentifier((byte[])result.Properties["objectSid"][0], 0)
+                                .ToString()
+                                .Split("-");
+                            string _ = sidPars[sidPars.Length - 1];
+                            int sid = Int32.Parse(_);
+                            //byte[] sidBytes = (byte[])result.Properties["objectSid"][0];
+                            //int sid = BitConverter.ToInt32(sidBytes, 0);
                             string displayName = result.Properties["displayName"][0].ToString();
                             string department = result.Properties.Contains("department") ? result.Properties["department"][0].ToString() : "";
                             string samAccountName = result.Properties["samaccountname"][0].ToString();

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using accounting.Controller;
+﻿using accounting.Controller;
 using accounting.DataBase;
 using accounting.View;
 
@@ -11,9 +10,14 @@ while (true)
     //deviceController.Start();
 
 
-    var connectionPermissionView = new ConnectionPermissionView();
-    var connectionPermissionDataAccess = new ConnectionPermissionDataAccess();
-    var connectionPermissionController =
-        new ConnectionPermissionController(connectionPermissionDataAccess, connectionPermissionView);
-    connectionPermissionController.Start();
+    //var connectionPermissionView = new ConnectionPermissionView();
+    //var connectionPermissionDataAccess = new ConnectionPermissionDataAccess();
+    //var connectionPermissionController =
+        //new ConnectionPermissionController(connectionPermissionDataAccess, connectionPermissionView);
+    //connectionPermissionController.Start();
+
+    var userView = new UserView();
+    var userDataAccess = new UserDataAccess();
+    var userController = new UserController(userDataAccess, userView);
+    userController.Start();
 }
