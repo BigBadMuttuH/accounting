@@ -1,18 +1,29 @@
-﻿namespace accounting.Model
+﻿namespace accounting.Model;
+
+public class Accounting
 {
-    public class Accounting
+    public Accounting(int id, User user, Device device, ConnectionPermission connectionPermission,
+        ConnectionPermission disconnectionPermission)
     {
-        public int Id { get; set; }
+        User = user;
+        Device = device;
+        ConnectionPermission = connectionPermission;
+        DisconnectionPermission = disconnectionPermission;
+    }
 
-        public User User;
+    public int Id { get; set; }
 
-        public Device Device;
+    public User User { get; }
 
-        public ConnectionPermission ConnectionPermission;
+    public Device Device { get; }
 
-        public Accounting()
-        {
+    public ConnectionPermission ConnectionPermission { get; }
 
-        }
+    public ConnectionPermission DisconnectionPermission { get; }
+
+    public override string ToString()
+    {
+        return
+            $"{Id}";
     }
 }

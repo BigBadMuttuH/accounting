@@ -28,6 +28,7 @@ namespace accounting.Model
 
         public User? GetUserFromActiveDirectory(string? userName)
         {
+            //TODO перенести иницилизацюи конфига 
             Config config = new Config();
             config.Domain = "regions.eais.customs.ru";
 
@@ -69,7 +70,7 @@ namespace accounting.Model
 
         public override string ToString()
         {
-            return $"{DisplayName}, Department: {Department}, SamAccountName: {SamAccountName}";
+            return $"{DisplayName}({Department})";
         }
     }
 }

@@ -44,7 +44,8 @@ public class Device
 
     public override string ToString()
     {
-        return $"InventoryNumber: {InventoryNumber}, Model: {Model}, {Vid}\\{Pid}, Serial Number: {SerialNumber}";
+        //return $"InventoryNumber: {InventoryNumber}, Model: {Model}, {Vid}\\{Pid}, Serial Number: {SerialNumber}";
+        return $"{InventoryNumber}({SerialNumber})";
     }
 
     /// <summary>

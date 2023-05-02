@@ -36,7 +36,9 @@ public class ConnectionPermissionDataAccess : IDataAccess<ConnectionPermission>
 
         using var command =
             new NpgsqlCommand(
-                "SELECT * FROM (SELECT * FROM connection_permission ORDER BY id DESC LIMIT @count) AS T ORDER BY id ASC",
+                @"SELECT * FROM
+                            (SELECT * FROM connection_permission ORDER BY id DESC LIMIT @count) AS T
+                        ORDER BY id ASC",
                 connection);
         command.Parameters.AddWithValue("@count", count);
         using var reader = command.ExecuteReader();
@@ -55,7 +57,8 @@ public class ConnectionPermissionDataAccess : IDataAccess<ConnectionPermission>
         using var connection = new NpgsqlConnection(_connectionString);
         ConnectionOpen(connection);
 
-        using var command = new NpgsqlCommand("SELECT * FROM connection_permission WHERE id = @id", connection);
+        using var command = new NpgsqlCommand(@"SELECT * FROM connection_permission
+                                                      WHERE id = @id", connection);
         command.Parameters.AddWithValue("@id", id);
         using var reader = command.ExecuteReader();
         if (reader.Read())
@@ -76,7 +79,9 @@ public class ConnectionPermissionDataAccess : IDataAccess<ConnectionPermission>
 
         using var command =
             new NpgsqlCommand(
-                "INSERT INTO connection_permission VALUES (@id, @permissionNumber, @permissionDate, @registrationNumber, @url)",
+                @"INSERT INTO connection_permission VALUES (
+                            @id, @permissionNumber, @permissionDate, @registrationNumber, @url
+                        )",
                 connection);
         command.Parameters.AddWithValue("@id", entity.Id);
         command.Parameters.AddWithValue("@permissionNumber", entity.PermissionNumber);
@@ -102,12 +107,12 @@ public class ConnectionPermissionDataAccess : IDataAccess<ConnectionPermission>
 
         using var command =
             new NpgsqlCommand(
-                "UPDATE connection_permission SET " +
-                "permission_number = @permissionNumber, " +
-                "permission_date = @permissionDate, " +
-                "registration_number = @registrationNumber, " +
-                "url = @url " +
-                "WHERE id = @id",
+                @"UPDATE connection_permission SET 
+                permission_number = @permissionNumber,
+                permission_date = @permissionDate,
+                registration_number = @registrationNumber,
+                url = @url 
+                WHERE id = @id",
                 connection);
 
         command.Parameters.AddWithValue("@permissionNumber", entity.PermissionNumber);
@@ -126,7 +131,8 @@ public class ConnectionPermissionDataAccess : IDataAccess<ConnectionPermission>
     {
         using var connection = new NpgsqlConnection(_connectionString);
         ConnectionOpen(connection);
-        using var command = new NpgsqlCommand("DELETE FROM connection_permission WHERE id = @id", connection);
+        using var command = new NpgsqlCommand(@"DELETE FROM connection_permission 
+                                                      WHERE id = @id", connection);
         command.Parameters.AddWithValue("@id", id);
 
         var rowsAffected = command.ExecuteNonQuery();
