@@ -1,9 +1,14 @@
 ﻿using accounting.Model;
+using Npgsql;
 
 namespace accounting.DataBase;
 
 public class AccountingDataAccess : IDataAccess<Accounting>
 {
+    private static readonly PgSqlConnection Conn = new();
+
+    private readonly string _connectionString = Conn.ToString();
+
     public IEnumerable<Accounting> GetAll()
     {
         throw new NotImplementedException();

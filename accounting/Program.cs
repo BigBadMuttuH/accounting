@@ -9,15 +9,14 @@ while (true)
     //var deviceController = new DeviceController(deviceDataAccess, deviceView);
     //deviceController.Start();
 
+    var connectionPermissionView = new ConnectionPermissionView();
+    var connectionPermissionDataAccess = new ConnectionPermissionDataAccess();
+    var connectionPermissionController =
+        new ConnectionPermissionController(connectionPermissionDataAccess, connectionPermissionView);
+    connectionPermissionController.Start();
 
-    //var connectionPermissionView = new ConnectionPermissionView();
-    //var connectionPermissionDataAccess = new ConnectionPermissionDataAccess();
-    //var connectionPermissionController =
-        //new ConnectionPermissionController(connectionPermissionDataAccess, connectionPermissionView);
-    //connectionPermissionController.Start();
-
-    var userView = new UserView();
-    var userDataAccess = new UserDataAccess();
-    var userController = new UserController(userDataAccess, userView);
-    userController.Start();
+    // var userView = new UserView();
+    // var userDataAccess = new UserDataAccess();
+    // var userController = new UserController(userDataAccess, userView);
+    // userController.Start();
 }
