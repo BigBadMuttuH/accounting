@@ -13,7 +13,7 @@ SELECT
 	u.display_name as FIO,
 	u.department as Department,
 	cp.permission_number as ConnectionPermissionNumber,
-	dcp.permission_number as DisconnectionPermissionNumber,
+	dcp.permission_number as DisconnectionPermissionNumber
 FROM accounting a
 JOIN ad_user u ON a.user_id = u.sid
 JOIN device d ON a.device_id = d.id
