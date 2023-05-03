@@ -14,9 +14,14 @@ initdb.exe -U postgres -A password -W -E UTF-8 -D "E:\pgSQL\Data\"
 
  - Russian code page
  ```SQL
-postgres=# \! chcp 125
+postgres=# \! chcp 1251
 ```
 or
 ```SQL
 set client_encoding='win1251';
+ ```
+
+ connect to database
+ ```SQL
+ psql -Upostgres -W -d acl
  ```
