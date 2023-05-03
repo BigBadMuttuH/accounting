@@ -25,6 +25,6 @@ public class Accounting
     public override string ToString()
     {
         return
-            $"{Id}";
+            $"{Id}, {ConnectionPermission.PermissionDate}, {Device.Model}, {User.DisplayName}, {User.Department}, {ConnectionPermission.PermissionNumber}, {DisconnectionPermission.PermissionNumber}";
     }
 }

@@ -25,6 +25,6 @@ public class ConnectionPermission
 
     public override string ToString()
     {
-        return $"{PermissionNumber}(url:{Url})";
+        return $"{PermissionNumber} {PermissionDate}";
     }
 }

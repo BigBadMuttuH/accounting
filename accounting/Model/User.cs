@@ -70,7 +70,7 @@ namespace accounting.Model
 
         public override string ToString()
         {
-            return $"{DisplayName}({Department})";
+            return $"{DisplayName}, {Department}";
         }
     }
 }

@@ -29,15 +29,18 @@ public class AccountingDataAccess : IDataAccess<Accounting>
             var deviceId = reader.GetInt32(2);
             var connectionPermissionId = reader.GetInt32(3);
             var disconnectionPermissionId = reader.IsDBNull(4) ? null : (int?)reader.GetInt32(4);
+
             var connectionPermissionDate = reader.GetDateTime(5);
-            var displayName = reader.GetString(6);
-            var department = reader.GetString(7);
-            var inventoryNumber = reader.GetString(8);
-            var serialNumber = reader.GetString(9);
-            var connectionPermissionNumber = reader.GetString(10);
-            var connectionPermissionUrl = reader.GetString(11);
+            // device
+            var inventoryNumber = reader.GetString(6);
+            var deviceModel = reader.GetString(7);
+            var serialNumber = reader.GetString(8);
+            // user
+            var displayName = reader.GetString(9);
+            var department = reader.GetString(10);
+            // permission
+            var connectionPermissionNumber = reader.GetString(11);
             var disconnectionPermissionNumber = reader.IsDBNull(12) ? "" : reader.GetString(12);
-            var disconnectionPermissionUrl = reader.IsDBNull(13) ? "" : reader.GetString(13);
 
             var user = new User(
                 userId,
@@ -46,7 +49,7 @@ public class AccountingDataAccess : IDataAccess<Accounting>
                 "");
             var device = new Device(
                 deviceId,
-                "",
+                deviceModel,
                 "",
                 "",
                 serialNumber,
@@ -56,14 +59,14 @@ public class AccountingDataAccess : IDataAccess<Accounting>
                 connectionPermissionNumber,
                 connectionPermissionDate,
                 "",
-                connectionPermissionUrl);
+                "");
             var disconnectionPermission = disconnectionPermissionId.HasValue
                 ? new ConnectionPermission(
                     disconnectionPermissionId.Value,
                     disconnectionPermissionNumber,
                     null,
                     "",
-                    disconnectionPermissionUrl)
+                    "")
                 : new ConnectionPermission();
 
             yield return new Accounting(id, user, device, connectionPermission, disconnectionPermission);
