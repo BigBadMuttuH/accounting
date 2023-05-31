@@ -28,8 +28,10 @@ public class AccountingController : IController
             Console.Clear();
 
             _accountingView.ShowLastRows(accountingList, 5);
-            var message = "A-Add, E-Edit, D-Delete, L-all records, I-show by ID. " +
-                          "\tCtrl+C - exit.";
+            var message = @"
+    A-Add, E-Edit, D-Delete, L-all records, I-show by ID.
+    1 - Devices; 2 - Users; 3 - Connection Permissions.
+    Ctrl+C - exit.";
             _accountingView.ShowMessage(message);
 
             var key = Console.ReadKey().Key;
@@ -69,7 +71,6 @@ public class AccountingController : IController
         {
             _accountingView.ShowError(ex.Message);
         }
-
     }
 
     public void Delete()
@@ -109,6 +110,7 @@ public class AccountingController : IController
             deviceController.Add();
         }
     }
+
     private bool GetId(out int id)
     {
         Console.Write("\nEnter Record ID: \t\t");
