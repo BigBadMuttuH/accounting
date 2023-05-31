@@ -1,4 +1,6 @@
-﻿using accounting.Model;
+﻿using accounting.DataBase;
+using accounting.Model;
+using accounting.View;
 
 namespace accounting.Controller;
 
@@ -82,7 +84,30 @@ public class AccountingController : IController
 
     public void Add()
     {
-        throw new NotImplementedException();
+        AddDevice();
+        AddUser();
+        AddConnectionPermission();
+
+        void AddConnectionPermission()
+        {
+            throw new NotImplementedException();
+        }
+
+        void AddUser()
+        {
+            throw new NotImplementedException();
+        }
+
+
+        void AddDevice()
+        {
+            var deviceDataAccess = new DeviceDataAccess();
+            var devicesList = new List<Device>(deviceDataAccess.GetAll());
+            var deviceView = new DeviceView();
+            var deviceController = new DeviceController(deviceDataAccess, deviceView);
+            deviceView.ShowLastRows(devicesList, 5);
+            deviceController.Add();
+        }
     }
     private bool GetId(out int id)
     {
