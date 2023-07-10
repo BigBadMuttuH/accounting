@@ -30,7 +30,7 @@ public class AccountingController : IController
             _accountingView.ShowLastRows(accountingList, 5);
             var message = @"
     A-Add, E-Edit, D-Delete, L-all records, I-show by ID.
-    1 - Devices; 2 - Users; 3 - Connection Permissions.
+    F1 - Devices; F2 - Users; F3 - Connection Permissions.
     Ctrl+C - exit.";
             _accountingView.ShowMessage(message);
 
@@ -38,6 +38,15 @@ public class AccountingController : IController
 
             switch (key)
             {
+                case ConsoleKey.F1:
+                    DeviceController();
+                    break;
+                case ConsoleKey.F2:
+                    UserController();
+                    break;
+                case ConsoleKey.F3:
+                    ConnectionPermissionController();
+                    break;
                 case ConsoleKey.L:
                     Show();
                     break;
@@ -73,6 +82,7 @@ public class AccountingController : IController
         }
     }
 
+
     public void Delete()
     {
         throw new NotImplementedException();
@@ -99,7 +109,6 @@ public class AccountingController : IController
             throw new NotImplementedException();
         }
 
-
         void AddDevice()
         {
             var deviceDataAccess = new DeviceDataAccess();
@@ -118,5 +127,30 @@ public class AccountingController : IController
         if (id > 0) return false;
         _accountingView.ShowError("ID must be grate then 0 and not be null.");
         return true;
+    }
+
+    public void DeviceController()
+    {
+        var deviceView = new DeviceView();
+        var deviceDataAccess = new DeviceDataAccess();
+        var deviceController = new DeviceController(deviceDataAccess, deviceView);
+        deviceController.Start();
+    }
+
+    public void ConnectionPermissionController()
+    {
+        var connectionPermissionView = new ConnectionPermissionView();
+        var connectionPermissionDataAccess = new ConnectionPermissionDataAccess();
+        var connectionPermissionController =
+            new ConnectionPermissionController(connectionPermissionDataAccess, connectionPermissionView);
+        connectionPermissionController.Start();
+    }
+
+    public void UserController()
+    {
+        var userView = new UserView();
+        var userDataAccess = new UserDataAccess();
+        var userController = new UserController(userDataAccess, userView);
+        userController.Start();
     }
 }
