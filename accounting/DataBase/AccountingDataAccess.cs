@@ -143,12 +143,12 @@ public class AccountingDataAccess : IDataAccess<Accounting>
 
         using var command = new NpgsqlCommand(
             "INSERT INTO accounting VALUES (" +
-            "@id, @user_id, @device_id, @connection_permission_id, @disconnection_permission_id)", connection);
+            "@id, @user_id, @device_id, @connection_permission_id)", connection);
         command.Parameters.AddWithValue("@id", entity.Id);
         command.Parameters.AddWithValue("@user_id", entity.User.Sid);
         command.Parameters.AddWithValue("@device_id", entity.Device.Id);
         command.Parameters.AddWithValue("@connection_permission_id", entity.ConnectionPermission.Id);
-        command.Parameters.AddWithValue("@disconnection_permission_id", entity.DisconnectionPermission.Id);
+        // command.Parameters.AddWithValue("@disconnection_permission_id", entity.DisconnectionPermission.Id);
 
         try
         {

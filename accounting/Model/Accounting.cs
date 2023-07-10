@@ -12,6 +12,14 @@ public class Accounting
         DisconnectionPermission = disconnectionPermission;
     }
 
+    public Accounting(int id, User user, Device device, ConnectionPermission connectionPermission)
+    {
+        Id = id;
+        User = user;
+        Device = device;
+        ConnectionPermission = connectionPermission;
+    }
+
     public int Id { get; set; }
 
     public User User { get; }

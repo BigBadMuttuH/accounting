@@ -7,6 +7,11 @@ public class ConnectionPermission
 
     public ConnectionPermission() { }
 
+    public ConnectionPermission(int id)
+    {
+        this.Id = id;
+    }
+
     public ConnectionPermission(int id, string permissionNumber, DateTime? permissionDate, string registrationNumber,
         string url)
     {

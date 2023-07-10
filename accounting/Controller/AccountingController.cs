@@ -1,6 +1,7 @@
 ﻿using accounting.DataBase;
 using accounting.Model;
 using accounting.View;
+using Microsoft.VisualBasic.CompilerServices;
 
 namespace accounting.Controller;
 
@@ -95,29 +96,24 @@ public class AccountingController : IController
 
     public void Add()
     {
-        AddDevice();
-        AddUser();
-        AddConnectionPermission();
+        Console.WriteLine("Enter Accounting ID:\t");
+        var accountingId = Int32.Parse(Console.ReadLine());
+        Console.WriteLine("Enter UserID:\t");
+        var accountingUserId = Int32.Parse(Console.ReadLine());
+        Console.WriteLine("Enter Device ID:\t");
+        var accountingDevicId = Int32.Parse(Console.ReadLine());
+        Console.WriteLine("Enter Connection Permission ID:\t");
+        var accountingConnectionPermissionId = Int32.Parse(Console.ReadLine());
 
-        void AddConnectionPermission()
-        {
-            throw new NotImplementedException();
-        }
+        User user = new User(accountingUserId);
+        Device device = new Device(accountingDevicId);
+        ConnectionPermission connectionPermission = new ConnectionPermission(accountingConnectionPermissionId);
 
-        void AddUser()
-        {
-            throw new NotImplementedException();
-        }
+        Accounting accounting = new Accounting(
+            accountingId, user, device, connectionPermission);
 
-        void AddDevice()
-        {
-            var deviceDataAccess = new DeviceDataAccess();
-            var devicesList = new List<Device>(deviceDataAccess.GetAll());
-            var deviceView = new DeviceView();
-            var deviceController = new DeviceController(deviceDataAccess, deviceView);
-            deviceView.ShowLastRows(devicesList, 5);
-            deviceController.Add();
-        }
+        AccountingDataAccess accountingDataAccess = new AccountingDataAccess();
+        accountingDataAccess.Add(accounting);
     }
 
     private bool GetId(out int id)

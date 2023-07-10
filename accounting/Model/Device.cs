@@ -12,6 +12,10 @@ public class Device
     public Device()
     {
     }
+    public Device(int id)
+    {
+        this.Id = id;
+    }
 
     // Конструктор с параметрами
     public Device(int id, string model, string vid, string pid, string serialNumber, string? inventoryNumber)

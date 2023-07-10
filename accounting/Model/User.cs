@@ -25,6 +25,10 @@ namespace accounting.Model
         {
             this.GetUserFromActiveDirectory(samAccountName);
         }
+        public User(int sid)
+        {
+            this.Sid = sid;
+        }
 
         public User? GetUserFromActiveDirectory(string? userName)
         {
