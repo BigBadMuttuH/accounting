@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using System.Security.Principal;
 using Microsoft.VisualBasic.CompilerServices;
+using System.Linq;
 
 namespace accounting.Model
 {
@@ -74,7 +75,14 @@ namespace accounting.Model
 
         public override string ToString()
         {
-            return $"{DisplayName}, {Department}";
+            // return $"{DisplayName}, {Department}";
+            return $"{DisplayName}, {GetInitials(Department)}";
+
+            string GetInitials(string input)
+            {
+                return string.Concat(
+                    input.Split(' ').Where(word => !string.IsNullOrEmpty(word)).Select(word => word[0]));
+            }
         }
     }
 }
